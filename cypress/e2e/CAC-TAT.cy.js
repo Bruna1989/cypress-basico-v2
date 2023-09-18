@@ -92,6 +92,34 @@ describe ('Central de atendimento ao Cliente TAT', function() {
     it('marca ambos checkboxes, depois desmarca o último', function(){
         cy.get('input[type="checkbox"]').check().should('be.checked').last().uncheck().should('not.be.checked')
     })
+    
+    it('seleciona um arquivo da pasta fixtures', function(){
+        cy.get('input[type="file"]').selectFile('cypress/fixtures/example.json')
+          .should(function($input){
+            expect($input[0].files[0].name).to.eql('example.json')
+          })
+    })
 
+    it('seleciona um arquivo simulando um drag-and-drop', function(){
+        cy.get('input[type="file"]').selectFile('cypress/fixtures/example.json', {action:'drag-drop'})
+          .should(function($input){
+            expect($input[0].files[0].name).to.eql('example.json')
+        })
+    })
+    it('seleciona um arquivo utilizando uma fixture para a qual foi dada um alias', function(){
+        cy.fixture("example").as('ArquivoExemplo')
+        cy.get('input[type="file"]').selectFile('@ArquivoExemplo')
+        .should(function($input){
+            expect($input[0].files[0].name).to.eql('example')
+        })
+    })
+    
+    it('verifica que a política de privacidade abre em outra aba sem a necessidade de um clique', function(){
+        cy.get('#privacy a').should('have.attr', 'target', '_blank')
+    })
 
+    it('acessa a página da política de privacidade removendo o target e então clicando no link', function(){
+        cy.get('#privacy a').invoke('removeAttr', 'target').click()
+        cy.contains('Talking About Testing').should('be.visible')
+    })
 })
